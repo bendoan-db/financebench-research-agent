@@ -25,7 +25,7 @@ os.environ['DATABRICKS_URL'] = get_context().apiUrl
 
 import yaml
 
-with open('./configs/document_research_agent.yaml', 'r') as file:
+with open('./agent_config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 #load global configs
@@ -69,7 +69,7 @@ mlflow.set_experiment(experiment_fqdn)
 
 # COMMAND ----------
 
-# MAGIC %run ./02_document_research_agent
+# MAGIC %run ./01_document_research_agent
 
 # COMMAND ----------
 

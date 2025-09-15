@@ -35,7 +35,7 @@ mlflow.set_tracking_uri("databricks")
 ######################################
 
 # TODO make sure you update the config file
-configs = mlflow.models.ModelConfig(development_config="./configs/document_research_agent.yaml")
+configs = mlflow.models.ModelConfig(development_config="./agent_config.yaml")
 
 databricks_config = config['databricks_config']
 agent_configs = configs.get("agent_configs")
