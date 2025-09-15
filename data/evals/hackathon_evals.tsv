@@ -1,0 +1,5 @@
+request	expected_response	expected_facts
+What was American Express's total revenue in 2020?	$36.1 billion	$36.1 billion
+What was AAPL's operating income in 2022?	$119,437 million	$119,437 million or $119.4 billion
+What was the quick ratio for American express in 2022? What factors contributed to this?	7.02 - it was influenced by significant increases in customer deposits (30%+ growth) and reduced reliance on short term borrowing	7.02, increase in customer deposit, reduced reliance on short term borrowing
+How did APPL's operating margin change between 2020 and 2021? What factors contributed to this?	Operating margin increase 3.2 percentage points (5.19% -> 8.39%) due to exceptional sales growth in the iphone, mac, and ipad business	3.2 percentage points, sales growth in iphone/mac/ipad business

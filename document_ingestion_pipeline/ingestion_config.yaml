@@ -1,0 +1,114 @@
+#global configs
+databricks_config:
+  catalog: vdm-classic-hkbucz_catalog
+  schema: financebench
+  document_volume: 10k_pdfs
+
+#configs for metadata extraction steps
+metadata_extraction_config:
+  bronze_table: 
+    name: sec_docs_bronze
+  silver_table: 
+    name: sec_docs_silver
+  gold_table: 
+    name: sec_docs_gold
+    schema:
+      - path
+      - modificationTime
+      - length
+      - content
+      - document_type
+      - year
+      - company
+      - resolved_company
+      
+#config for entity resolution steps
+entity_resolution_config:
+  entity_table: company_entities
+  vector_search_index: company_entities_index
+  vector_search_endpoint: financebench
+  embedding_model: databricks-gte-large-en
+  vector_search_id_column: id
+  embedding_source_column: company_name
+  #specify llm for entity resolution
+  resolution_llm_config:
+    llm_endpoint_name: databricks-llama-4-maverick
+    prompt: "You are an expert reviewer. Your job is to view the following input which may contain spelling mistakes or extra characters, and match it to one of the possible entities in the following list. RETURN ONLY THE MATCHED ENTITY AND NOTHING ELSE. DO NOT REPEAT THE PROMPT OR ADD ANY ADDITIONAL INFORMATION. Some examples can be found below \n\n
+
+    INPUT -> INTELL \n
+    POSSIBLE ENTITIES -> INTEL; AMD; MICROSOFT \n
+    MATCHED ENTITY -> INTEL\n
+
+    INPUT -> KRAFT HEINZ\n
+    POSSIBLE ENTITIES -> KRAFTHEINZ; MCDONALDS; COCACOLA\n
+    MATCHED ENTITY -> KRAFTHEINZ\n
+    
+    INPUT ->
+    "
+  er_temp_table: sec_docs_silver_with_entities
+
+chunk_extraction_config:
+  bronze_table: 
+    name: sec_doc_chunks_bronze
+    schema:
+      - path
+      - modificationTime
+      - document_type
+      - year
+      - company
+      - resolved_company
+      - parsed_content
+  silver_table: 
+    name: sec_doc_chunks_silver
+    schema:
+      - path
+      - modificationTime
+      - document_type
+      - year
+      - company
+      - resolved_company
+      - doc_content
+      - page_number
+      - quality_score
+    resolution_llm_config:
+      llm_endpoint_name: databricks-meta-llama-3-3-70b-instruct
+      prompt: "You are an expert and educator in the field of financial analysis and SEC documents. Below is an extract from an page extracted from an SEC filing. Evaluate whether the page has a high educational value and could be useful in generating an investment thesis and answering company-related questions. You should record your evaluation rating as a 1 if the page content is helpful or a 0 if the page contents is not helpful. Some guidelines for your scoring are provided below. \n\n
+      * Any pages containing financial information, tables or metrics are considered helpful and should be given a 1\n
+      * Any pages containing an overview of the company and/or its operations are considered helpful and should be given a 1\n
+      * Any pages containing information about the company business model, risks, leadership, and management decisions are considered helpful and should be given a 1 \n
+      * Any pages containing information about debts, securities, and issuances of any financial securities are considered helpful and should be given a 1\n
+      * Agendas and key topics for the document are considered helpful and should be given a 1 \n
+      * Title pages and tables of contents are considered not helpful and should be given a 0\n
+      * RETURN THE SCORE (1 or 0) AND NOTHING ELSE\n
+
+      The Extract can be found below:\n\n"
+  gold_table:
+    name: sec_doc_chunks_gold
+    schema:
+      - chunk_id
+      - path
+      - modificationTime
+      - document_type
+      - year
+      - company
+      - resolved_company
+      - doc_content
+      - doc_summarization
+      - page_number
+    summarization_llm_config:
+      llm_endpoint_name: databricks-meta-llama-3-3-70b-instruct
+      prompt: "The following document chunk was extracted from an SEC filing (10k, 8k, 10q, etc.). Summarize and situate the chunk in the larger context of an SEC doc. You should return a concise but descriptive summarization. Additionally, if the chunk contains any financial information, you should clearly highlight the financial metrics, data, and figures in the chunk. Any financial metrics should be reported in a structured, easily consumable format. Additionally, you should identify the SEC filing items and section that the chunk falls into, if possible, in your summarization. RETURN ONLY THE SUMMARIZATION AND NOTHING ELSE. Below is some additional information to aid in your summarization."
+    vector_search_config:
+      endpoint_name: financebench
+      index_name: sec_doc_chunks_index
+      id_column: chunk_id
+      text_column: doc_content
+      embedding_model: databricks-gte-large-en
+
+
+#generation configs
+llm_config:
+  llm_endpoint_name: doan-gpt-4o
+  llm_parameters:
+    max_tokens: 1500
+    temperature: 0.0

@@ -1,0 +1,126 @@
+databricks_config:
+  catalog: vdm-classic-hkbucz_catalog # TODO: add catalog
+  schema: financebench # TODO: add schema
+  model: financebench_research_agent # TODO: add UC model name
+  workspace_url: fe-vm-vdm-classic-hkbucz.cloud.databricks.com # TODO: add workspace url
+  sql_warehouse_id: # TODO: add sql warehouse id
+  databricks_pat:
+    secret_scope_name: doan # TODO: add secret scope name
+    secret_key_name: db-pat-token # TODO: add secret key name
+  mlflow_experiment_name: doan_financebench # TODO: add mlflow experiment name
+  eval_table_name: financebench_evals
+
+retriever_config:
+  chunk_template: '\n\nPassage: {chunk_text}
+
+    '
+  embedding_model: databricks-gte-large-en
+  parameters:
+    k: 10
+    query_type: hybrid
+  schema:
+    chunk_text: doc_content
+    document_uri: path
+    primary_key: chunk_id
+    doc_year: year
+    doc_type: document_type
+  vector_search_endpoint: financebench
+  vector_search_index: sec_doc_chunks_index
+
+agent_configs:
+  agent_name: sec-research-agent
+  conversation:
+    max_messages: 10  # Maximum number of conversational messages to keep in context
+  llm:
+    endpoint_name: "databricks-claude-sonnet-4" # TODO: or use "databricks-claude-sonnet-4"
+    temperature: 0.0  # Lower temperature for more consistent supervisor routing
+  document_agent:
+    description: | # TODO: add your Genie agent description
+      You are an SEC document research agent; your task is retrieve SEC documents to help answer questions about an organization's strategy, risks, management decisions, and legal and financial discosures.
+
+      INSTRUCTIONS
+      - When retrieving documents to answer the question, be sure to use pre-filtering in your vector search query. 
+      - Answer the question as completely as possible using ONLY the information provided in the retrieved documents
+      - After you're done with your tasks, respond to the supervisor directly
+      - Respond ONLY with the results of your work, do NOT include ANY other text.
+  deep_research_agent:
+    description: | # TODO: add your DeepResearchAgent agent description
+      Executes parallel document retrieval queries using the document agent to analyze SEC financial data. Takes pre-planned queries from the supervisor and runs them concurrently for comprehensive financial analysis and question answering.
+  supervisor_agent:
+    max_iterations: 5
+    system_prompt: |
+      You are a supervisor managing a multi-agent system for SEC financial data analysis with advanced research planning capabilities.
+
+      For financial questions, you have two strategies:
+
+      1. **Simple Routing**: For straightforward single-step questions, route directly to the document agent
+      2. **Research Planning**: For complex questions requiring multiple financial metrics or comparative analysis:
+        - YOU break down the question into 2-5 specific subqueries. The subqueries should decompose the input question at hand to help you formulate a complete response.
+        - YOU create a research plan with these queries
+        - DeepResearchAgent executes your pre-planned queries in parallel via document agent
+        - DeepResearchAgent synthesizes results from the parallel execution
+
+      Available agents:
+      {formatted_descriptions}
+
+      **Temporal Context Handling**: When the user uses relative time terms ("current", "this year", "this quarter", "recent", "latest"), you have access to temporal context at the top of this prompt. Transform these relative terms into explicit dates/years before creating queries or routing to agents.
+      
+      Example transformations:
+      - "current fiscal year performance" → "FY2025 performance" (using the fiscal year context provided)
+      - "this quarter's results" → "Q1 2025 results" (using the fiscal quarter context provided)
+      - "recent performance" → "2022 performance" (using latest available data year)
+      
+      **Decision Logic** (Route to Genie FIRST for simple questions):
+      - Use the Document Agent DIRECTLY for:
+        * Single financial metric queries (e.g., "What was AAPL's revenue in 2015?")
+        * Simple calculations from one data source (e.g., "Calculate AAPL's current ratio in 2016")
+        * Basic year-over-year comparisons for one metric and one company
+        * Questions asking for one specific financial statement item
+      - Use DeepResearchAgent ONLY for truly complex analysis requiring:
+        * Multi-company comparative analysis (e.g., comparing AAPL vs BAC performance)
+        * Multiple interconnected financial ratios or metrics in one analysis
+        * Trend analysis across multiple years AND multiple metrics simultaneously
+        * Complex financial analysis requiring 3+ separate data queries
+      - Use FINISH when you have sufficient information to provide a comprehensive financial analysis
+
+      When using DeepResearchAgent, the system will automatically handle parallel execution and result synthesis of financial data.
+    
+    research_prompt: |
+      **ROUTING DECISION CRITERIA**
+      Analyze this financial question to determine routing and research planning:
+      
+      **DEFAULT TO document agent FIRST** - Set should_plan_research=False and next_node="Genie" for:
+      - Single financial metric queries ("What was AAPL's revenue in 2015?")
+      - Simple calculations from one data source ("Calculate BAC's current ratio for 2014")
+      - Basic year-over-year comparisons for one metric/company ("How did AAPL's revenue change from 2014 to 2015?")
+      - Single company financial statement items ("Show me AXP's net income from 2010 to 2012")
+      
+      **USE USE DEEP RESEARCH AGENT** - Set should_plan_research=True and next_node="DeepResearchAgent" ONLY when the question requires multiple separate parallel queries:
+      - Multi-company comparative analysis ("Compare AAPL, BAC, and AXP profitability")
+      - Multiple disconnected financial metrics requiring separate queries ("Analyze AAPL's liquidity, profitability, and solvency for 2015")
+      - Complex analysis requiring 3+ separate parallel data queries
+      - Cross-metric trend analysis spanning multiple years AND multiple ratios
+      
+      **If should_plan_research=True, create a research_plan with:**
+      - queries: 2-5 specific subqueries for the document agent
+        * IMPORTANT: Include relevant temporal context in each query when the original question relates to "current", "this year", "this quarter", or other time-relative terms
+        * Example: If user asks "current fiscal year performance", transform into "FY2025 performance" or "performance for fiscal year ending August 2025"
+        * Each query should be self-contained with explicit dates/years rather than relative terms
+      - rationale: Brief explanation of why parallel research is needed
+      
+      **When in doubt, bias toward the document agent (should_plan_research=False).**
+    
+    final_answer_prompt: |
+      Using only the content in the messages, respond to the previous user question using the financial data analysis provided by the other assistant messages.
+      
+      **For simple questions that went directly to the document agent:**
+      - Provide a direct, concise answer to the specific question asked
+      - Include only the relevant financial data/metrics requested
+      - Keep the response brief and to the point
+      
+      **For complex questions that used DeepResearchAgent:**
+      - Start with a brief "Research Summary" noting the parallel research approach
+      - Provide a comprehensive analysis synthesizing multiple data points
+      - Present findings in a structured financial analysis format
+      
+      Always focus on answering the specific question asked without unnecessary elaboration.
