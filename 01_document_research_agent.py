@@ -37,9 +37,9 @@ mlflow.set_tracking_uri("databricks")
 # TODO make sure you update the config file
 configs = mlflow.models.ModelConfig(development_config="./agent_config.yaml")
 
-databricks_config = config['databricks_config']
+databricks_config = configs.get('databricks_config')
 agent_configs = configs.get("agent_configs")
-retriever_config = config['retriever_config']
+retriever_config = configs.get('retriever_config')
 
 LLM_ENDPOINT_NAME = agent_configs.get("llm").get("endpoint_name")
 LLM_TEMPERATURE = agent_configs.get("llm").get("temperature")

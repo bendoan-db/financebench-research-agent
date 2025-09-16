@@ -126,7 +126,8 @@ from mlflow.genai.scorers import (
     Correctness,
     RelevanceToQuery,
     Safety,
-    Guidelines
+    Guidelines,
+    RetrievalRelevance
 )
 import mlflow
 from evaluation_utils.figure_correctness import figure_correctness
@@ -153,8 +154,7 @@ eval_results = mlflow.genai.evaluate(
         Correctness(),
         RelevanceToQuery(),
         Safety(),
-        figure_correctness,
-        Guidelines(name="structure", guidelines=structure),
+        RetrievalRelevance()
     ],
 )
 

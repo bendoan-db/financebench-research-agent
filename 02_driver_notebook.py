@@ -7,7 +7,7 @@
 # COMMAND ----------
 
 # MAGIC %pip install -q -U -r requirements.txt
-# MAGIC %pip install -q uv pyyaml
+# MAGIC %pip install -q pyyaml
 # MAGIC dbutils.library.restartPython()
 
 # COMMAND ----------
@@ -33,6 +33,8 @@ databricks_config = config['databricks_config']
 retriever_config = config['retriever_config']
 agent_configs = config["agent_configs"]
 
+llm_name = agent_configs["llm"]["endpoint_name"]
+
 #load uc configs
 catalog=databricks_config['catalog']
 schema=databricks_config['schema']
@@ -44,10 +46,6 @@ model_name=databricks_config['model']
 vector_search_endpoint = retriever_config['vector_search_endpoint']
 vector_search_index = retriever_config['vector_search_index']
 embedding_model = retriever_config['embedding_model']
-
-# doc_agent_config = config["doc_agent_config"]
-# genie_agent_config = config["genie_agent_config"]
-# supervisor_config = config["supervisor_agent_config"]
 
 # COMMAND ----------
 
@@ -83,7 +81,7 @@ example_input = {
         "messages": [
             {
                 "role": "user",
-                "content": "What is the amount of the cash proceeds that JnJ realised from the separation of Kenvue (formerly Consumer Health business segment), as of August 30, 2023?",
+                "content": "What was the change in operating income for AAPL between 2019 and 2020, and what caused this trend?",
             }
         ]
     }
@@ -97,6 +95,7 @@ print(response.messages[0].content)
 
 # MAGIC %md
 # MAGIC # Evaluate
+# MAGIC [Eval Dataset in UC](https://fe-vm-vdm-classic-hkbucz.cloud.databricks.com/explore/data/vdm-classic-hkbucz_catalog/financebench/financebench_evals?o=2309167578215964&activeTab=sample)
 
 # COMMAND ----------
 
@@ -113,11 +112,7 @@ display(eval_dataset)
 # COMMAND ----------
 
 # MAGIC %md
-# MAGIC ## Create Guidelines
-
-# COMMAND ----------
-
-structure = """The response must use clear, concise language and structures responses logically. It avoids jargon or explains technical terms when used."""
+# MAGIC ## Run Evaluation
 
 # COMMAND ----------
 
@@ -133,10 +128,9 @@ from mlflow.genai.scorers import (
     Correctness,
     RelevanceToQuery,
     Safety,
-    Guidelines
+    Guidelines,
+    RetrievalRelevance
 )
-
-from evaluation_utils.figure_correctness import figure_correctness
 
 def my_predict_fn(messages): # the signature corresponds to the keys in the "inputs" dict
   return AGENT.predict(
@@ -151,6 +145,7 @@ eval_results = mlflow.genai.evaluate(
         Correctness(),
         RelevanceToQuery(),
         Safety(),
+        RetrievalRelevance(),
     ],
 )
 
@@ -158,6 +153,10 @@ eval_results = mlflow.genai.evaluate(
 
 # MAGIC %md
 # MAGIC # Register Model
+
+# COMMAND ----------
+
+print(os.path.join(os.getcwd(), "01_document_research_agent"))
 
 # COMMAND ----------
 
@@ -174,16 +173,14 @@ from mlflow.models.resources import (
 
 with mlflow.start_run():
     logged_chain_info = mlflow.pyfunc.log_model(
-        python_model=os.path.join(os.getcwd(), "01a_unstructured_retrieval_agent"),
-        model_config=os.path.join(os.getcwd(), "configs/agent.yaml"), 
+        python_model=os.path.join(os.getcwd(), "01_document_research_agent"),
+        model_config=os.path.join(os.getcwd(), "agent_config.yaml"), 
         name=model_name,  # Required by MLflow
-        code_paths=[os.path.join(os.getcwd(), "vector_search_utils")],
+        code_paths=[os.path.join(os.getcwd(), "vector_search_utils"), os.path.join(os.getcwd(), "supervisor_utils")],
         input_example=example_input,
         resources=[
         DatabricksVectorSearchIndex(index_name=f"{catalog}.{schema}.{vector_search_index}"),
-        DatabricksServingEndpoint(endpoint_name=doc_agent_config["llm_config"]["llm_endpoint_name"]),
-        DatabricksServingEndpoint(endpoint_name=genie_agent_config["llm_config"]["llm_endpoint_name"]),
-        DatabricksServingEndpoint(endpoint_name=supervisor_config["llm_config"]["llm_endpoint_name"]),
+        DatabricksServingEndpoint(endpoint_name=llm_name),
         DatabricksServingEndpoint(endpoint_name=embedding_model)
         ],
         pip_requirements=["-r requirements.txt"],
@@ -221,12 +218,11 @@ agents.deploy(
     model_version=uc_registered_model_info.version,
     environment_vars={
         "DATABRICKS_URL": get_context().apiUrl,
-        "DATABRICKS_TOKEN": dbutils.secrets.get(
-            scope="doan-demos", key="databricks-pat"
-        ),
+        "DATABRICKS_TOKEN": dbutils.secrets.get(scope="doan", key="db-pat-token")
     },
 )
 
 # COMMAND ----------
 
-
+# MAGIC %md
+# MAGIC * [Model Serving Endpoint](https://fe-vm-vdm-classic-hkbucz.cloud.databricks.com/ml/endpoints/agents_vdm-classic-hkbucz_catalog-financebench-financebench_res/traces?o=2309167578215964)

@@ -1,17 +1,14 @@
-# databricks_genai_hackathon
+# Databricks Financebench Research Agent
 
 # Overview
 
-This repository offers complete examples of implementing GenAI agents on Databricks. It leverages the Databricks Agent Framework, integrates with [Langchain/Langgraph](https://blog.langchain.dev/langgraph-multi-agent-workflows/), and supports Vector Search, Unity Catalog Functions, and [Genie](https://www.databricks.com/product/ai-bi/genie) — a state-of-the-art text-to-SQL tool developed by Databricks.
-
-The agents are deployed using Databricks Model Serving and are monitored through Databricks Model Monitoring. The repository includes small datasets featuring preprocessed text chunks from publicly available SEC filings, mock structured data for select companies, and an evaluation set of question/answer pairs sourced from the FinanceBench repository. This evaluation data is used for both offline and online performance assessment.
+This repository offers complete examples of implementing GenAI document research agents on Databricks for the [FinanceBench](https://github.com/patronus-ai/financebench). It leverages the Databricks Agent Framework, integrates with [Langchain/Langgraph](https://blog.langchain.dev/langgraph-multi-agent-workflows/), and supports Vector Search, Unity Catalog Functions, and [Genie](https://www.databricks.com/product/ai-bi/genie) — a state-of-the-art text-to-SQL tool developed by Databricks. The agents are deployed using Databricks Model Serving and are monitored through Databricks Model Monitoring. 
 
 
 # Project Structure
 
-The project is organized into multiple components including notebooks, configs, agents, and environment setup.
-
-Users have to edit the YAML files for the project and for the individual ChatModels that get deployed on Databricks. The models and the contained agents are specified in notebooks that users can run as is or modify to achieve the specific goals of the hackathon.
+The project is organized into multiple components including notebooks, configs, agents, and environment setup, defined below:
+* `document_ingestion_pipeline` contains notebooks and separate configuration YAMLs to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `data` directory
 
 
 # Cluster Config
