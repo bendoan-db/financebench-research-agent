@@ -50,8 +50,8 @@ client = VectorSearchClient()
 try:
   index = client.create_delta_sync_index(
     endpoint_name=vector_search_endpoint,
-    source_table_name=f"`{catalog}`.{schema}.{entity_table}",
-    index_name=f"`{catalog}`.{schema}.{vector_search_index}",
+    source_table_name=f"`{catalog}`.`{schema}`.`{entity_table}`",
+    index_name=f"`{catalog}`.`{schema}`.`{vector_search_index}`",
     pipeline_type="TRIGGERED",
     primary_key=vector_search_id_column,
     embedding_source_column=embedding_source_column,

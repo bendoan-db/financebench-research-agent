@@ -1,8 +1,9 @@
 #global configs
 databricks_config:
   catalog: vdm-classic-hkbucz_catalog
-  schema: financebench
+  schema: financebench_temp
   document_volume: 10k_pdfs
+  eval_table_name: financebench_evals
 
 #configs for metadata extraction steps
 metadata_extraction_config:
