@@ -8,51 +8,24 @@ This repository offers complete examples of implementing GenAI document research
 # Project Structure
 
 The project is organized into multiple components including notebooks, configs, agents, and environment setup, defined below:
-* `document_ingestion_pipeline` contains notebooks and separate configuration YAMLs to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `data` directory
+* `setup/document_ingestion_pipeline` contains notebooks and a separate configuration YAML to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `setup/data` directory
+  * This directory contains notebooks to load the financebench pdfs to a volume, parse the pdfs, extract metadata, clean up the chunks, and create the vector search index
+  * `07_ingest_eval_questions` loads the 150 financebench eval questions to a delta table for downstream evaluation
+  * `__runner` can be used to execute all the notebooks in sequence
+* `agent_config.yaml` should be updated with your models, catalog, schema, etc.
+* `01_document_research_agent` contains the core code for the multi-agent supervisor code can be modified to meet customer needs or improve benchmark performance further.
+* `02_driver notebook` runs the document agent on example questions, performs the full evaluation, and register/deploys the model. You test any modifications done to `01_document_research_agent` using this notebook.
+* `03_eval_agentbricks` is currently WIP. It is used to evaluate the Databricks Knowledge Assistant (KA) Agent Brick on the same financebench benchmark. Instructions to run this on the way.
 
 
 # Cluster Config
 
-On Databricks, use either a serverless cluster or a standard cluster running Runtime 15.4 LTS or higher. The Machine Learning Runtime is not recommended.
+On Databricks, use either a serverless cluster or a standard cluster running Runtime ML 16.4 LTS or higher.
 
 If you’re using a standard Databricks Runtime, please [install](https://docs.databricks.com/aws/en/libraries/cluster-libraries) the required libraries listed in the [requirements.txt](requirements.txt) file. In this case, you can omit the `pip install ...` commands at the beginning of the notebooks.
 
 If you’re using Serverless compute, please uncomment and run the `pip install ...` commands in each notebook to install the necessary libraries.
 
-
-# For admins
-
-- ideally, hackathon users should be granted permission to create their individual unity catalog schema. This greatly reduces the need to specify individual assets like tablenames, uc-function names, models etc. 
-- caution when cloning the repo to individual users workspace folders: yaml files do not get cloned, users have to copy and edit them manually 
-
-# Project Setup
-
- - edit [configs/project.yml](configs/project.yml) to specify your settings
-   - specify the parameters for project. These parameters are used throughout the repo. It is recommended that individual users/team use their own dedicated `uc_schema`. 
-   - In most notebooks the pydantic models in [configs/project.py](configs/project.py) are used to fill in additional parameters. You have the option to specify most of these additional parameters manually in [configs/project.yml](configs/project.yml) but that should typically not be necessary. For example when `source_table_name` is not specified in the yaml file, then it is derived by the pydantic model validator as `<uc_catalog>.<uc_schema>.<table_name>`. 
- - run the project setup notebook  [setup_env/workspace_assets.ipynb](setup_env/workspace_assets.ipynb)
-   - for the deployment of the model with a Genie agent, users have to use a Personal Access Token
- - set up the data using the notebooks in the [data](data) folder
- - proceed to the notebooks in the [notebooks](notebooks) folder
-
- # Notebooks
-
-After the project is configured and the datatables created you can work through the notebooks in the [notebooks](notebooks) folder:
- - [01_create_vector_search_index.ipynb](notebooks/01_create_vector_search_index.ipynb): Create a vector search index based on a delta table that was created in [data/sec_rag_docs_pages.ipynb](data/sec_rag_docs_pages.ipynb)
- - [01_test_vector_search_index.ipynb](notebooks/01_test_vector_search_index.ipynb) test the vector search index
- - [02_create_uc_functions.ipynb](notebooks/02_create_uc_functions.ipynb) create 2 uc functions to use in the chat model
- - [03_synthetic_evals.py](notebooks/03_synthetic_evals.py) this is optional and shows how to generate question/answer pairs based on a delta table holding the prepared content for the vector search.
- - [04_RAG_agent.ipynb](notebooks/04_RAG_agent.ipynb): This notebook demonstrates how to author a LangGraph agent that's compatible with Mosaic AI Agent Framework features:
-    - Author a tool-calling LangGraph agent wrapped with `ChatAgent`
-    - Manually test the agent's output
-    - Evaluate the agent using Mosaic AI Agent Evaluation
-    - Log and deploy the agent
-    - two companion notebooks are provided for evaluation and monitoring of the deployed chatmodel: [04_RAG_agent_eval.ipynb](notebooks/04_RAG_agent_eval.ipynb) and [04_RAG_agent_monitoring.ipynb](notebooks/04_RAG_agent_monitoring.ipynb)
- - [05_RAG_Genie_agent.ipynb](notebooks/05_RAG_Genie_agent.ipynb): This notebook demonstrates how to build a multi-agent system using Mosaic AI Agent Framework and [LangGraph](https://blog.langchain.dev/langgraph-multi-agent-workflows/), where [Genie](https://www.databricks.com/product/ai-bi/genie) is one of the agents.
-    1. Author a multi-agent system using LangGraph.
-    2. Wrap the LangGraph agent with MLflow `ChatAgent` to ensure compatibility with Databricks features.
-    3. Manually test the multi-agent system's output.
-    4. Log and deploy the multi-agent system.
 
 # Disclaimer
 

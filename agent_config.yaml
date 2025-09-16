@@ -111,7 +111,7 @@ agent_configs:
       **When in doubt, bias toward the document agent (should_plan_research=False).**
     
     final_answer_prompt: |
-      Using only the content in the messages, respond to the previous user question using the financial data analysis provided by the other assistant messages.
+      Using only the content in the messages, respond to the previous user question using the financial data analysis provided by the previous agents.
       
       **For simple questions that went directly to the document agent:**
       - Provide a direct, concise answer to the specific question asked

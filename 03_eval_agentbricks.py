@@ -24,7 +24,7 @@
 
 import yaml
 
-with open('./configs/research_agent.yaml', 'r') as file:
+with open('./agent_config.yaml', 'r') as file:
     config = yaml.safe_load(file)
 
 #load global configs
@@ -34,9 +34,9 @@ retriever_config = config['retriever_config']
 #load uc configs
 catalog=databricks_config['catalog']
 schema=databricks_config['schema']
-mlflow_experiment=databricks_config['mlflow_experiment']
+mlflow_experiment=databricks_config['mlflow_experiment_name']
 eval_table=databricks_config['eval_table_name']
-model_name=databricks_config['model_name']
+model_name=databricks_config['model']
 
 # COMMAND ----------
 
@@ -130,7 +130,6 @@ from mlflow.genai.scorers import (
     RetrievalRelevance
 )
 import mlflow
-from evaluation_utils.figure_correctness import figure_correctness
 
 os.environ["RAG_EVAL_MAX_WORKERS"] = "1" 
 
