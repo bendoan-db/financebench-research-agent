@@ -1,11 +1,11 @@
-# Databricks Financebench Research Agent
+# Databricks FinanceBench Research Agent
 
-# Overview
+## Overview
 
-This repository offers complete examples of implementing GenAI document research agents on Databricks for the [FinanceBench](https://github.com/patronus-ai/financebench). It leverages the Databricks Agent Framework, integrates with [Langchain/Langgraph](https://blog.langchain.dev/langgraph-multi-agent-workflows/), and supports Vector Search, Unity Catalog Functions, and [Genie](https://www.databricks.com/product/ai-bi/genie) — a state-of-the-art text-to-SQL tool developed by Databricks. The agents are deployed using Databricks Model Serving and are monitored through Databricks Model Monitoring. 
+This repository offers complete examples of implementing GenAI document research agents on Databricks for the [FinanceBench](https://github.com/patronus-ai/financebench). It leverages the Databricks Agent Framework, integrates with [Langchain/Langgraph](https://blog.langchain.dev/langgraph-multi-agent-workflows/), and supports Vector Search, and Unity Catalog Functions. The agents are deployed using Databricks Model Serving and are monitored through Databricks Model Monitoring. 
 
 
-# Project Structure
+## Project Structure
 
 The project is organized into multiple components including notebooks, configs, agents, and environment setup, defined below:
 * `setup/document_ingestion_pipeline` contains notebooks and a separate configuration YAML to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `setup/data` directory
@@ -18,7 +18,7 @@ The project is organized into multiple components including notebooks, configs, 
 * `03_eval_agentbricks` is currently WIP. It is used to evaluate the Databricks Knowledge Assistant (KA) Agent Brick on the same financebench benchmark. Instructions to run this on the way.
 
 
-# Cluster Config
+## Cluster Configs
 
 On Databricks, use either a serverless cluster or a standard cluster running Runtime ML 16.4 LTS or higher.
 
@@ -27,7 +27,7 @@ If you’re using a standard Databricks Runtime, please [install](https://docs.d
 If you’re using Serverless compute, please uncomment and run the `pip install ...` commands in each notebook to install the necessary libraries.
 
 
-# Disclaimer
+## Disclaimer
 
 These examples are provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose, and noninfringement. In no event shall the authors, copyright holders, or contributors be liable for any claim, damages, or other liability, whether in an action of contract, tort, or otherwise, arising from, out of, or in connection with the software or the use or other dealings in the software.
 
