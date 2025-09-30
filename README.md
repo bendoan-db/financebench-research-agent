@@ -8,10 +8,23 @@ This repository offers complete examples of implementing GenAI document research
 ## Project Structure
 
 The project is organized into multiple components including notebooks, configs, agents, and environment setup, defined below:
-* `setup/document_ingestion_pipeline` contains notebooks and a separate configuration YAML to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `setup/data` directory
+
+## Smoke Test
+`smoke_test` contains a set of notebooks for quickly testing your workspace configuration to ensure that features are enabled to run the rest of this repo. It will create a test vector search index and deploy a test endpoint using the agent framework. To run it, follow the instructions below:
+  1. Update `smoke_test_config.yaml` with the correct values corresponding to your workspace
+  2. Run all cells in the `00_runner` notebook
+
+Once the test is complete, you can delete test assets created.
+
+
+## Document Ingestion Pipeline
+`setup/document_ingestion_pipeline` contains notebooks and a separate configuration YAML to ingest the FinanceBench PDFs (10ks, 10qs, etc.) in the `setup/data` directory
   * This directory contains notebooks to load the financebench pdfs to a volume, parse the pdfs, extract metadata, clean up the chunks, and create the vector search index
   * `07_ingest_eval_questions` loads the 150 financebench eval questions to a delta table for downstream evaluation
   * `__runner` can be used to execute all the notebooks in sequence
+
+
+## Agent Development
 * `agent_config.yaml` should be updated with your models, catalog, schema, etc.
 * `01_document_research_agent` contains the core code for the multi-agent supervisor code can be modified to meet customer needs or improve benchmark performance further.
 * `02_driver notebook` runs the document agent on example questions, performs the full evaluation, and register/deploys the model. You test any modifications done to `01_document_research_agent` using this notebook.
