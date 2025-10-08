@@ -135,14 +135,15 @@ os.environ["RAG_EVAL_MAX_WORKERS"] = "1"
 
 def my_predict_fn(question):
     response = CLIENT.responses.create(
-        model="ka-e5c2bcc7-endpoint",
-        input=[
-            {
-                "role": "user",
-                "content": question
-            }
-        ]
-    )
+        model="agents_vdm-classic-hkbucz_catalog-financebench-financebench_res",
+        input={
+    "messages": [
+        {
+        "role": "user",
+        "content": "What was the change in operating income for AAPL between 2019 and 2020, and what caused this trend?"
+        }
+    ]
+    }
     return response.output[0].content[0].text
 
 # Run evaluation with predefined scorers
