@@ -80,10 +80,17 @@ example_input = {
         "messages": [
             {
                 "role": "user",
-                "content": "What was the operating income for American Express in 2021?",
+                "content": "What were some key risks highlighted for for AAPL in 2020?",
             }
         ]
     }
+
+# COMMAND ----------
+
+from vector_search_utils.self_querying_retriever import load_self_querying_retriever
+
+sq_retriever = load_self_querying_retriever(llm, databricks_config, retriever_config)
+sq_retriever.invoke(example_input)
 
 # COMMAND ----------
 

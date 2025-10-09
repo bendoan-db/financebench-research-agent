@@ -19,11 +19,11 @@ retriever_config:
     k: 10
     query_type: hybrid
   schema:
-    chunk_text: doc_content
-    document_uri: path
+    chunk_text: content_chunked
+    document_uri: doc_uri
     primary_key: chunk_id
-    doc_year: year
-    doc_type: document_type
+    doc_year: doc_year
+    doc_type: doc_name
   vector_search_endpoint: financebench
   vector_search_index: smoke_test_index
 
