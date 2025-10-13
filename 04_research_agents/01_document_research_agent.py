@@ -30,9 +30,9 @@ from typing_extensions import Annotated, TypedDict
 
 mlflow.set_tracking_uri("databricks")
 
-######################################
-## Load variables from the config file
-######################################
+#########################################
+## Load variables from the config file ##
+#########################################
 
 # TODO make sure you update the config file
 configs = mlflow.models.ModelConfig(development_config="./agent_config.yaml")

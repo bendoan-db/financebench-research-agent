@@ -1,0 +1,43 @@
+databricks_config:
+  catalog: vdm-classic-hkbucz_catalog # TODO: add catalog
+  schema: financebench # TODO: add schema
+  model: financebench_research_agent # TODO: add UC model name
+  workspace_url: fe-vm-vdm-classic-hkbucz.cloud.databricks.com # TODO: add workspace url
+  sql_warehouse_id: # TODO: add sql warehouse id
+  databricks_pat:
+    secret_scope_name: doan # TODO: add secret scope name
+    secret_key_name: db-pat-token # TODO: add secret key name
+  mlflow_experiment_name: doan_financebench # TODO: add mlflow experiment name
+  eval_table_name: financebench_evals
+
+retriever_config:
+  chunk_template: '\n\nPassage: {chunk_text}
+
+    '
+  embedding_model: databricks-gte-large-en
+  parameters:
+    k: 10
+    query_type: hybrid
+  schema:
+    chunk_text: doc_content
+    document_uri: path
+    primary_key: chunk_id
+    doc_year: year
+    doc_type: document_type
+  vector_search_endpoint: financebench
+  vector_search_index: sec_doc_chunks_index
+
+agent_configs:
+  agent_name: sec-doc-agent
+  conversation:
+    max_messages: 10  # Maximum number of conversational messages to keep in context
+  llm:
+    endpoint_name: "databricks-claude-sonnet-4" # TODO: or use "databricks-claude-sonnet-4"
+    temperature: 0.0  # Lower temperature for more consistent supervisor routing
+    prompt: |
+      You are an SEC document research agent; your task is retrieve SEC documents to help answer questions about an organization's strategy, risks, management decisions, and legal and financial discosures.
+
+      INSTRUCTIONS
+      - When retrieving documents to answer the question, be sure to use pre-filtering in your vector search query. 
+      - Answer the question as completely as possible using ONLY the information provided in the retrieved documents
+      - Respond ONLY with the results of your work, do NOT include ANY other text.

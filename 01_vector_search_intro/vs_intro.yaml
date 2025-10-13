@@ -1,0 +1,30 @@
+databricks_config:
+  catalog: vdm-classic-hkbucz_catalog # TODO: add catalog
+  schema: hackathon_test # TODO: add schema
+  model: hackathon_smoketest_agent # TODO: add UC model name
+  workspace_url: fe-vm-vdm-classic-hkbucz.cloud.databricks.com # TODO: add workspace url
+  databricks_pat:
+    secret_scope_name: doan # TODO: add secret scope name
+    secret_key_name: db-pat-token # TODO: add secret key name
+  mlflow_experiment_name: doan_financebench # TODO: add mlflow experiment name
+
+retriever_config:
+  document_table_name: smoke_test_documents
+  chunk_template: '\n\nPassage: {chunk_text}
+
+    '
+  embedding_model: databricks-gte-large-en
+  parameters:
+    k: 10
+    query_type: hybrid
+  schema:
+    chunk_text: content_chunked
+    document_uri: doc_uri
+    primary_key: chunk_id
+    doc_year: doc_year
+    doc_type: doc_name
+  vector_search_endpoint: financebench
+  vector_search_index: smoke_test_index
+
+agent_config:
+  endpoint_name: databricks-claude-sonnet-4-5

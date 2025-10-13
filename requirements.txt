@@ -1,7 +1,7 @@
-mlflow[databricks]==3.1.0
+mlflow[databricks]
 langgraph==0.3.4
-uv==0.6.10
-databricks-sdk==0.55.0
+uv
+databricks-sdk
 databricks-agents
 databricks-langchain==0.5.1
 databricks-vectorsearch==0.56
