@@ -1,13 +1,13 @@
 databricks_config:
   catalog: vdm-classic-hkbucz_catalog # TODO: add catalog
   schema: financebench # TODO: add schema
-  model: financebench_research_agent # TODO: add UC model name
+  model: financebench_hackathon_doc_agent # TODO: add UC model name
   workspace_url: fe-vm-vdm-classic-hkbucz.cloud.databricks.com # TODO: add workspace url
   sql_warehouse_id: # TODO: add sql warehouse id
   databricks_pat:
     secret_scope_name: doan # TODO: add secret scope name
     secret_key_name: db-pat-token # TODO: add secret key name
-  mlflow_experiment_name: doan_financebench # TODO: add mlflow experiment name
+  mlflow_experiment_name: doan_financebench_hackathon # TODO: add mlflow experiment name
   eval_table_name: financebench_evals
 
 retriever_config:

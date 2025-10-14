@@ -96,7 +96,13 @@ response = AGENT.predict(example_input)
 
 # COMMAND ----------
 
-print(response.model_dump(exclude_none=True).get("output")[-1]["content"][0]["text"])
+output_data = response.model_dump(exclude_none=True)
+
+if output_data:
+    print(output_data["messages"][-1]["content"])
+else:
+    print('No output available')
+
 
 # COMMAND ----------
 
@@ -173,17 +179,16 @@ from mlflow.models.resources import (
 
 with mlflow.start_run():
     logged_chain_info = mlflow.pyfunc.log_model(
-        python_model=os.path.join(os.getcwd(), "01_document_research_agent"),
+        python_model=os.path.join(os.getcwd(), "01_document_agent"),
         model_config=os.path.join(os.getcwd(), "agent_config.yaml"), 
         name=model_name,  # Required by MLflow
-        code_paths=[os.path.join(os.getcwd(), "vector_search_utils"), os.path.join(os.getcwd(), "supervisor_utils")],
         input_example=example_input,
         resources=[
         DatabricksVectorSearchIndex(index_name=f"{catalog}.{schema}.{vector_search_index}"),
         DatabricksServingEndpoint(endpoint_name=llm_name),
         DatabricksServingEndpoint(endpoint_name=embedding_model)
         ],
-        pip_requirements=["-r requirements.txt"],
+        pip_requirements=["-r ../requirements.txt"],
     )
 
 # COMMAND ----------
@@ -221,8 +226,3 @@ agents.deploy(
         "DATABRICKS_TOKEN": dbutils.secrets.get(scope="doan", key="db-pat-token")
     },
 )
-
-# COMMAND ----------
-
-# MAGIC %md
-# MAGIC * [Model Serving Endpoint](https://fe-vm-vdm-classic-hkbucz.cloud.databricks.com/ml/endpoints/agents_vdm-classic-hkbucz_catalog-financebench-financebench_res/traces?o=2309167578215964)

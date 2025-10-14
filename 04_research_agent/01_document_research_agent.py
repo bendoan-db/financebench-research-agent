@@ -67,8 +67,6 @@ llm = ChatDatabricks(
 ## Create a Document Agent with access to a VS index
 ###################################################
 
-from supervisor_utils.handoff_tools import create_handoff_tool
-
 sq_retriever = load_self_querying_retriever(llm, databricks_config, retriever_config)
 
 doc_retrieval_agent = create_react_agent(

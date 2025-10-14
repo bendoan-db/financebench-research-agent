@@ -1,3 +1,4 @@
+import mlflow
 from databricks.vector_search.client import VectorSearchClient
 
 from langchain.chains.query_constructor.schema import AttributeInfo
@@ -13,6 +14,7 @@ from langchain.chains.query_constructor.base import (
 
 from databricks_langchain import DatabricksVectorSearch
 
+@mlflow.trace(span_type="RETRIEVER")
 def load_self_querying_retriever(model, databricks_config, retriever_config):
     """
     Loads selfquerying retriever using the retriever config and model
