@@ -139,7 +139,7 @@ def my_predict_fn(messages): # the signature corresponds to the keys in the "inp
 
 # Run evaluation with predefined scorers
 eval_results = mlflow.genai.evaluate(
-    data=eval_dataset.toPandas(),
+    data=eval_dataset.limit(5).toPandas(),
     predict_fn=my_predict_fn,
     scorers=[
         Correctness(),

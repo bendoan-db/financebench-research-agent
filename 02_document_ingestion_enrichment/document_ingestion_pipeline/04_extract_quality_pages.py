@@ -63,3 +63,8 @@ display(spark.table(f"`{catalog}`.{schema}.{silver_chunk_table}").groupBy("quali
 # COMMAND ----------
 
 display(spark.table(f"`{catalog}`.{schema}.{silver_chunk_table}").filter(col("quality_score")==0))
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC [💡Fun Fact: We can use this to finetune a classification model!](https://fe-vm-vdm-classic-hkbucz.cloud.databricks.com/ml/bricks/t2t/improve-quality/534fcd6e-c4df-4db0-a516-434e346a655e?o=2309167578215964)
