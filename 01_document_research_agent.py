@@ -30,9 +30,9 @@ from typing_extensions import Annotated, TypedDict
 
 mlflow.set_tracking_uri("databricks")
 
-######################################
-## Load variables from the config file
-######################################
+#########################################
+## Load variables from the config file ##
+#########################################
 
 # TODO make sure you update the config file
 configs = mlflow.models.ModelConfig(development_config="./agent_config.yaml")
@@ -66,8 +66,6 @@ llm = ChatDatabricks(
 ###################################################
 ## Create a Document Agent with access to a VS index
 ###################################################
-
-from supervisor_utils.handoff_tools import create_handoff_tool
 
 sq_retriever = load_self_querying_retriever(llm, databricks_config, retriever_config)
 
