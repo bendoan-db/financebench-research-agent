@@ -1,13 +1,13 @@
 databricks_config:
   catalog: vdm-classic-hkbucz_catalog # TODO: add catalog
   schema: financebench # TODO: add schema
-  model: financebench_research_agent # TODO: add UC model name
+  model: document_research_agent # TODO: add UC model name
   workspace_url: fe-vm-vdm-classic-hkbucz.cloud.databricks.com # TODO: add workspace url
   sql_warehouse_id: # TODO: add sql warehouse id
   databricks_pat:
     secret_scope_name: doan # TODO: add secret scope name
     secret_key_name: db-pat-token # TODO: add secret key name
-  mlflow_experiment_name: doan_financebench # TODO: add mlflow experiment name
+  mlflow_experiment_name: doan_financebench_research # TODO: add mlflow experiment name
   eval_table_name: financebench_evals
 
 retriever_config:
@@ -70,7 +70,7 @@ agent_configs:
       - "this quarter's results" → "Q1 2025 results" (using the fiscal quarter context provided)
       - "recent performance" → "2022 performance" (using latest available data year)
       
-      **Decision Logic** (Route to Genie FIRST for simple questions):
+      **Decision Logic**:
       - Use the Document Agent DIRECTLY for:
         * Single financial metric queries (e.g., "What was AAPL's revenue in 2015?")
         * Simple calculations from one data source (e.g., "Calculate AAPL's current ratio in 2016")
